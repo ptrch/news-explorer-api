@@ -5,7 +5,7 @@ const helmet = require('helmet');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { errors } = require('celebrate');
-const router = require('./routes/index')
+const router = require('./routes/index');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const NotFoundErr = require('./errors/NotFoundErr');
 // создаем объект приложения
