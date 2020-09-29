@@ -5,12 +5,8 @@ const helmet = require('helmet');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { errors } = require('celebrate');
-// const { celebrate, Joi, errors } = require('celebrate');
-const users = require('./routes/users');
-const articles = require('./routes/articles');
+const router = require('./routes/index')
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-const { login, createUser } = require('./controllers/users');
-const auth = require('./middlewares/auth');
 const NotFoundErr = require('./errors/NotFoundErr');
 // создаем объект приложения
 const app = express();
@@ -34,10 +30,7 @@ app.get('/crash-test', () => {
     throw new Error('Сервер сейчас упадёт');
   }, 0);
 });
-app.post('/signin', login);
-app.post('/signup', createUser);
-app.use('/users', auth, users);
-app.use('/articles', auth, articles);
+app.use(router);
 
 app.use(() => {
   throw new NotFoundErr('Запрашиваемый ресурс не найден');
