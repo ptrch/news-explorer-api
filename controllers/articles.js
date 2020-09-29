@@ -1,16 +1,33 @@
 const Article = require('../models/article');
 const BadRequestErr = require('../errors/BadRequestErr');
-const ForbiddenErr = require('../errors/ForbiddenErr');
+const NotFoundErr = require('../errors/NotFoundErr');
 
 module.exports.getArticles = (req, res, next) => {
-  Article.find({})
+  Article.find({ owner: req.user._id })
     .then((articles) => res.send({ data: articles }))
     .catch(next);
 };
 
 module.exports.createArticles = (req, res, next) => {
-  const { keyword, title, text, date, source, link, image } = req.body;
-  Article.create({ keyword, title, text, date, source, link, image, owner: req.user._id })
+  const {
+    keyword,
+    title,
+    text,
+    date,
+    source,
+    link,
+    image,
+  } = req.body;
+  Article.create({
+    keyword,
+    title,
+    text,
+    date,
+    source,
+    link,
+    image,
+    owner: req.user._id,
+  })
     .then((article) => res.send({ data: article }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -21,17 +38,16 @@ module.exports.createArticles = (req, res, next) => {
 };
 
 module.exports.delArticles = (req, res, next) => {
-  Article.findById(req.params.articleId)
+  Article.findOne({ _id: req.params.articleId, owner: req.user._id })
     .then(async (article) => {
-      const userId = req.user._id;
-      const ownerId = article.owner._id.toString();
-      if (ownerId === userId) {
-        res.send({ data: await Article.findByIdAndDelete(req.params.articleId) });
-      } throw new ForbiddenErr('Вы не можете удалить чужую карточку');
+      await Article.findByIdAndDelete({ _id: req.params.articleId });
+      res.send({ data: article });
     })
     .catch((err) => {
-      if (err.name === 'CastError' || err.name === 'TypeError') {
-        throw new BadRequestErr('Не удалось удалить карточку. Запрашиваемый ресурс не найден');
+      if (err.name === 'CastError') {
+        throw new BadRequestErr('Не удалось удалить статью. Запрашиваемый ресурс не найден');
+      } if (err.name === 'DocumentNotFoundError') {
+        throw new NotFoundErr('У вас нет статьи для удаления с указанным идентификатором');
       } else next(err);
     })
     .catch(next);

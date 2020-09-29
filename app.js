@@ -4,6 +4,7 @@ require('dotenv').config();
 const helmet = require('helmet');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const { errors } = require('celebrate');
 // const { celebrate, Joi, errors } = require('celebrate');
 const users = require('./routes/users');
 const articles = require('./routes/articles');
@@ -21,7 +22,7 @@ app.use(helmet());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 // подключаемся к серверу MongoDB
-mongoose.connect('mongodb://localhost:27017/mestodb', {
+mongoose.connect('mongodb://localhost:27017/news-api', {
   useNewUrlParser: true,
   useCreateIndex: true,
   useFindAndModify: false,
@@ -36,7 +37,7 @@ app.get('/crash-test', () => {
 app.post('/signin', login);
 app.post('/signup', createUser);
 app.use('/users', auth, users);
-app.use('/articles', articles);
+app.use('/articles', auth, articles);
 
 app.use(() => {
   throw new NotFoundErr('Запрашиваемый ресурс не найден');
