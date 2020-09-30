@@ -8,6 +8,7 @@ const { errors } = require('celebrate');
 const router = require('./routes/index');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const NotFoundErr = require('./errors/NotFoundErr');
+const limiter = require('./middlewares/rateLimiter');
 // создаем объект приложения
 const app = express();
 // начинаем прослушивать подключения на 3000 порту
@@ -24,6 +25,7 @@ mongoose.connect('mongodb://localhost:27017/news-api', {
   useFindAndModify: false,
   useUnifiedTopology: true,
 });
+app.use(limiter);
 app.use(requestLogger);
 app.get('/crash-test', () => {
   setTimeout(() => {
