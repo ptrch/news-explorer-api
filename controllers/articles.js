@@ -1,6 +1,7 @@
 const Article = require('../models/article');
 const BadRequestErr = require('../errors/BadRequestErr');
 const NotFoundErr = require('../errors/NotFoundErr');
+const { Message } = require('../errors/messages');
 
 module.exports.getArticles = (req, res, next) => {
   Article.find({ owner: req.user._id })
@@ -45,9 +46,9 @@ module.exports.delArticles = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadRequestErr('Не удалось удалить статью. Запрашиваемый ресурс не найден');
+        throw new BadRequestErr(Message.delError);
       } if (err.name === 'DocumentNotFoundError') {
-        throw new NotFoundErr('У вас нет статьи для удаления с указанным идентификатором');
+        throw new NotFoundErr(Message.notFoundNews);
       } else next(err);
     })
     .catch(next);

@@ -1,9 +1,10 @@
 const rateLimit = require('express-rate-limit');
+const { Message } = require('../errors/messages');
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
-  message: ({ message: 'Отправлено слишком много запросов, повторите попытку позже' }),
+  message: (Message.tooManyRequests),
 });
 
 module.exports = limiter;

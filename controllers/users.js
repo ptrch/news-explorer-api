@@ -5,6 +5,7 @@ const User = require('../models/user');
 const BadRequestErr = require('../errors/BadRequestErr');
 const ConflictErr = require('../errors/ConflictErr');
 const AuthorizationErr = require('../errors/AuthorizationErr');
+const { Message } = require('../errors/messages');
 
 module.exports.getUser = (req, res, next) => {
   User.find({})
@@ -16,10 +17,10 @@ module.exports.createUser = (req, res, next) => {
     name, email, password,
   } = req.body;
   if (!password) {
-    throw new BadRequestErr('Введите пароль');
+    throw new BadRequestErr(Message.inputPassword);
   }
   if (password.length < 8) {
-    throw new BadRequestErr('Слишком короткий пароль');
+    throw new BadRequestErr(Message.shotPassword);
   }
   return bcrypt.hash(req.body.password, 10)
     .then((hash) => User.create({
@@ -33,7 +34,7 @@ module.exports.createUser = (req, res, next) => {
         throw new BadRequestErr(err.message);
       }
       if (err.name === 'MongoError' && err.code === 11000) {
-        throw new ConflictErr('Такой пользователь уже существует');
+        throw new ConflictErr(Message.userAlredyExists);
       }
       return next(err);
     })

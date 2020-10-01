@@ -1,47 +1,48 @@
 const mongoose = require('mongoose');
 const urlValid = require('validator').isURL;
+const { Message } = require('../errors/messages');
 
 const articleSchema = new mongoose.Schema({
   keyword: {
     type: String,
-    required: [true, 'это поле является обязательным'],
+    required: true,
   },
   title: {
     type: String,
-    required: [true, 'это поле является обязательным'],
+    required: true,
   },
   text: {
     type: String,
-    required: [true, 'это поле является обязательным'],
+    required: true,
   },
   date: {
     type: String,
-    required: [true, 'это поле является обязательным'],
+    required: true,
   },
   source: {
     type: String,
-    required: [true, 'это поле является обязательным'],
+    required: true,
   },
   link: {
     type: String,
-    required: [true, 'это поле является обязательным'],
+    required: true,
     validate: {
       validator: (v) => urlValid(v),
-      message: 'некорректная ссылка',
+      message: Message.invalidLink,
     },
   },
   image: {
     type: String,
-    required: [true, 'это поле является обязательным'],
+    required: true,
     validate: {
       validator: (v) => urlValid(v),
-      message: 'некорректная ссылка',
+      message: Message.invalidLink,
     },
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user',
-    required: [true, 'это поле является обязательным'],
+    required: true,
   },
 });
 

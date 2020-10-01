@@ -9,6 +9,7 @@ const router = require('./routes/index');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const NotFoundErr = require('./errors/NotFoundErr');
 const limiter = require('./middlewares/rateLimiter');
+const { Message } = require('./errors/messages');
 // создаем объект приложения
 const app = express();
 // начинаем прослушивать подключения на 3000 порту
@@ -29,13 +30,13 @@ app.use(limiter);
 app.use(requestLogger);
 app.get('/crash-test', () => {
   setTimeout(() => {
-    throw new Error('Сервер сейчас упадёт');
+    throw new Error(Message.serverFail);
   }, 0);
 });
 app.use(router);
 
 app.use(() => {
-  throw new NotFoundErr('Запрашиваемый ресурс не найден');
+  throw new NotFoundErr(Message.notFound);
 });
 app.use(errorLogger);
 app.use(errors());
@@ -45,7 +46,7 @@ app.use((err, req, res, next) => {
     .status(statusCode)
     .send({
       message: statusCode === 500
-        ? 'На сервере произошла ошибка'
+        ? Message.serverError
         : message,
     });
   next();
