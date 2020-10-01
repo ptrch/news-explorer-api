@@ -1,4 +1,4 @@
-module.exports.Messages = {
+module.exports.Message = {
   serverFail: 'Сервер сейчас упадет',
   notFound: 'Запрашиваемый ресурс не найден',
   serverError: 'На сервере произошла ошибка',
