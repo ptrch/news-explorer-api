@@ -10,17 +10,17 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 const NotFoundErr = require('./errors/NotFoundErr');
 const limiter = require('./middlewares/rateLimiter');
 const { Message } = require('./errors/messages');
+
+const { NODE_ENV, PORT = 3000, DB_ADDRESS } = process.env;
 // создаем объект приложения
 const app = express();
-// начинаем прослушивать подключения на 3000 порту
-const { PORT = 3000 } = process.env;
 // подключим заголовки безопасности
 app.use(helmet());
 // подключаем парсеры
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 // подключаемся к серверу MongoDB
-mongoose.connect('mongodb://localhost:27017/news-api', {
+mongoose.connect(NODE_ENV === 'production' ? DB_ADDRESS : 'mongodb://localhost:27017/news-api', {
   useNewUrlParser: true,
   useCreateIndex: true,
   useFindAndModify: false,
