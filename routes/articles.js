@@ -1,6 +1,9 @@
 const router = require('express').Router();
+const urlValid = require('validator').isURL;
 const { celebrate, Joi } = require('celebrate');
 const { getArticles, createArticles, delArticles } = require('../controllers/articles');
+const BadRequestErr = require('../errors/BadRequestErr');
+const { Message } = require('../errors/messages');
 
 router.get('/', getArticles);
 router.post('/', celebrate({
@@ -10,8 +13,20 @@ router.post('/', celebrate({
     text: Joi.string().required(),
     date: Joi.string().required(),
     source: Joi.string().required(),
-    link: Joi.string().required().regex(/^(https?:\/\/)?((([a-z\d]([a-z\d-]*[a-z\d])*)\.)+[a-z]{2,}|((\d{1,3}\.){3}\d{1,3}))(:\d+)?(\/[-a-z\d%_.~+]*)*(\?[;&a-z\d%_.~+=-]*)?(#[-a-z\d_]*)?$/),
-    image: Joi.string().required().regex(/^(https?:\/\/)?((([a-z\d]([a-z\d-]*[a-z\d])*)\.)+[a-z]{2,}|((\d{1,3}\.){3}\d{1,3}))(:\d+)?(\/[-a-z\d%_.~+]*)*(\?[;&a-z\d%_.~+=-]*)?(#[-a-z\d_]*)?$/),
+    link: Joi.required().custom((value) => {
+      if (!urlValid(value)) {
+        throw new BadRequestErr(Message.invalidLink);
+      } else {
+        return value;
+      }
+    }),
+    image: Joi.required().custom((value) => {
+      if (!urlValid(value)) {
+        throw new BadRequestErr(Message.invalidLink);
+      } else {
+        return value;
+      }
+    }),
   }),
 }), createArticles);
 router.delete('/:articleId', celebrate({
