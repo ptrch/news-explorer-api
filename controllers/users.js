@@ -8,8 +8,8 @@ const AuthorizationErr = require('../errors/AuthorizationErr');
 const { Message } = require('../errors/messages');
 
 module.exports.getUser = (req, res, next) => {
-  User.find({})
-    .then((users) => res.send({ data: users }))
+  User.find({ _id: req.user._id }, { _id: false, email: true, name: true })
+    .then((users) => res.send(users))
     .catch(next);
 };
 module.exports.createUser = (req, res, next) => {
