@@ -11,4 +11,7 @@ module.exports.Message = {
   shotPassword: 'Слишком короткий пароль',
   invalidLink: 'Введите корректную ссылку',
   incorEmailPassword: 'Неправильные почта или пароль',
+  articleForbidden: 'Вы не можете удалить чужую статью',
+  articleDeleted: 'Статья удалена',
+  articleNotFound: 'Такой статьи не существует',
 };

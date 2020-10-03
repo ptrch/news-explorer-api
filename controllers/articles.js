@@ -1,6 +1,7 @@
 const Article = require('../models/article');
 const BadRequestErr = require('../errors/BadRequestErr');
 const NotFoundErr = require('../errors/NotFoundErr');
+const ForbiddenErr = require('../errors/ForbiddenErr');
 const { Message } = require('../errors/messages');
 
 module.exports.getArticles = (req, res, next) => {
@@ -39,17 +40,16 @@ module.exports.createArticles = (req, res, next) => {
 };
 
 module.exports.delArticles = (req, res, next) => {
-  Article.findOne({ _id: req.params.articleId, owner: req.user._id })
-    .then(async (article) => {
-      await Article.findByIdAndDelete({ _id: req.params.articleId });
-      res.send({ data: article });
-    })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        throw new BadRequestErr(Message.delError);
-      } if (err.name === 'DocumentNotFoundError') {
-        throw new NotFoundErr(Message.notFoundNews);
-      } else next(err);
+  Article.findById(req.params.articleId)
+    .orFail(new NotFoundErr(Message.articleNotFound))
+    .then((article) => {
+      const { owner } = article;
+      if (req.user._id === owner.toString()) {
+        Article.deleteOne(article)
+          .then(() => res.status(200).send({ message: Message.articleDeleted }));
+      } else {
+        throw new ForbiddenErr(Message.articleForbidden);
+      }
     })
     .catch(next);
 };
